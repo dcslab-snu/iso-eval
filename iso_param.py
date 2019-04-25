@@ -1,4 +1,7 @@
+# coding: UTF-8
+
 from typing import Optional, Union, Iterable
+
 
 class IsoStep:
     """
@@ -11,6 +14,26 @@ class IsoStep:
         self._strides = strides
         self._first_time = first_time
         self._interval = interval
+
+    @property
+    def start_param(self) -> Union[int, str]:
+        return self._start_param
+
+    @property
+    def num_of_steps(self) -> int:
+        return self._num_of_steps
+
+    @property
+    def strides(self) -> int:
+        return self._strides
+
+    @property
+    def first_time(self) -> int:
+        return self._first_time
+
+    @property
+    def interval(self) -> int:
+        return self._interval
 
 
 class IsoSeq:
@@ -25,4 +48,12 @@ class IsoParam:
     def __init__(self, iso_step: Optional[IsoStep], iso_seq: Optional[IsoSeq]) -> None:
         self._iso_step = iso_step
         self._iso_seq = iso_seq
+
+    @property
+    def iso_step(self) -> IsoStep:
+        return self._iso_step
+
+    @property
+    def iso_seq(self) -> IsoSeq:
+        return self._iso_seq
 

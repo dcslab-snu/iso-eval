@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # coding: UTF-8
 
+import time
 from typing import Optional, Union, Iterable
 from iso_type import IsoType
-from iso_param import IsoParam
+from iso_param import IsoParam, IsoStep, IsoSeq
 from abc import *
 
 from utils import DVFS, ResCtrl, numa_topology
@@ -17,6 +18,9 @@ class IsoSetting(metaclass=ABCMeta):
     def __init__(self, iso_type: IsoType, iso_param: IsoParam) -> None:
         self._iso_type = iso_type
         self._iso_param = iso_param
+        self._first_interval = self.iso_step.first_time
+        self._interval = self.iso_step.interval
+        self._num_of_steps = self.iso_step.num_of_steps
 
     @property
     def iso_type(self) -> IsoType:
@@ -26,12 +30,48 @@ class IsoSetting(metaclass=ABCMeta):
     def iso_param(self) -> IsoParam:
         return self._iso_param
 
+    @property
+    def iso_step(self) -> IsoStep:
+        return self.iso_param.iso_step
+
+    @property
+    def iso_seq(self) -> IsoSeq:
+        return self.iso_param.iso_seq
+
+    @property
+    def first_interval(self) -> int:
+        return self._first_interval
+
+    @property
+    def interval(self) -> int:
+        return self._interval
+
+    @property
+    def num_of_steps(self) -> int:
+        return self._num_of_steps
+
+    def perform_iso(self) -> None:
+        print(f'starting perform_iso...')
+        counts = 0
+        print(f'waiting first interval...')
+        time.sleep(self.first_interval)
+        print(f'perform isolation... (counts: {counts})')
+        self._perform_iso(self.iso_step.start_param)
+        counts += 1
+
+        # Perform isolations
+        while counts < self.num_of_steps:
+            time.sleep(self.interval)
+            next_param = self._next_param()
+            print(f'perform isolation... (counts: {counts})')
+            self._perform_iso(next_param)
+
     @abstractmethod
-    def init_iso(self) -> None:
+    def _perform_iso(self, next_param: Union[int, str]) -> None:
         pass
 
     @abstractmethod
-    def perform_iso(self) -> None:
+    def _next_param(self) -> Union[int, str]:
         pass
 
 
